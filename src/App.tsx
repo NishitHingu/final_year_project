@@ -8,7 +8,7 @@ import { useAppSelector } from "./app/hooks";
 import { Typography } from "@material-ui/core";
 
 function App() {
-  const searchStockList = useAppSelector(state => state.autocompleteSearchBar.searchedStocks);
+  const searchedStock = useAppSelector(state => state.autocompleteSearchBar.searchedStock);
 
 
   return (
@@ -19,11 +19,9 @@ function App() {
           <Route path="/home">
             <div style={{fontSize: "24px", padding: "1rem"}}>
               Home
-              {searchStockList.map(item => (
-                <Typography variant="h5" key={item}>
-                  {item}
+                <Typography variant="h5">
+                  {searchedStock}
                 </Typography>
-              ))}
             </div>
           </Route>
           <Route path="/stock">

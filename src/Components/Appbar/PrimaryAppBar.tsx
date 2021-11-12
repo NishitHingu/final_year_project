@@ -10,7 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import { Autocomplete, Button, Grid, makeStyles, TextField, Theme } from '@material-ui/core';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { addStockToSearchedList } from '../../features/searchBar/autocompleteSearchBar';
+import { updateSearchedStock } from '../../features/searchBar/autocompleteSearchBar';
 
 const StyledNavLink = styled(NavLink)(({theme}) => ({
   color: theme.palette.getContrastText(theme.palette.primary.main),
@@ -68,7 +68,7 @@ export default function PrimaryAppBar(props: {name: string}) {
   const searchOptions = useAppSelector(state => state.autocompleteSearchBar.stockList)
 
   const handleSearch = () => {
-      dispatch(addStockToSearchedList(searchTerm));
+      dispatch(updateSearchedStock(searchTerm));
       setSearchTerm("");
   }
 
