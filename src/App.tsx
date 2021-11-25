@@ -4,12 +4,10 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import { useAppSelector } from "./app/hooks";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
+import Base from "./Components/StockPage/Base";
 
 function App() {
-  const searchedStock = useAppSelector(state => state.autocompleteSearchBar.searchedStock);
-
 
   return (
     <div className="App">
@@ -19,19 +17,19 @@ function App() {
           <Route path="/home">
             <div style={{fontSize: "24px", padding: "1rem"}}>
               Home
-                <Typography variant="h5">
-                  {searchedStock}
-                </Typography>
+                
             </div>
           </Route>
           <Route path="/stock">
             <div style={{fontSize: "24px", padding: "1rem"}}>
-              Stock
+              <Base />
             </div>
           </Route>
           <Route path="/about">
             <div style={{fontSize: "24px", padding: "1rem"}}>
-              About
+            <Typography variant="h3" align="center" style={{paddingTop: "34"}}>
+              Financial Market Analysis Platform
+            </Typography>  
             </div></Route>  
         </Switch>
       </Router>

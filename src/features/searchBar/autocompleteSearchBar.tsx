@@ -2,55 +2,70 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface stockInfo {
+  stockName: string,
+  price: number,
+  dayLow: number,
+  dayHigh: number,
+  percentageChange: number,
+}
+
+interface stockState {
   stockList: string[];
   searchedStock: string | null;
-  stockInfo: Object | null;
-  loading?: 'idle' | 'loading' | 'succeeded' | 'failed';
+  stockInfo: stockInfo | null;
+  status?: 'idle' | 'loading' | 'succeeded' | 'failed';
   error?: string | null;
 }
 
-const initialState: stockInfo = {
-  stockList: ["MRF", "TSLA", "TCS", "FB", "SUNO", "CL", "INFOSYS"],
+const initialState: stockState = {
+  stockList: ["MRF", "TSLA", "TCS", "FB", "SUNO", "CL", "INFY"],
   searchedStock: null,
   stockInfo: null,
 };
 
-const searchBarReducer = createSlice({
-  name: "stockList",
-  initialState,
-  reducers: {
-    updateStockInfo(state, action: PayloadAction<Object>) {
-      state.stockInfo = action.payload;
-    },
-  },
-  // extraReducers: (builder) => {
-  //   builder.addCase(upadteSearchedStock.fulfilled, (state, action: PayloadAction<Object>) => {
-  //     state.stockInfo = action.payload
-  //   })
-  // }
-});
+
+// Async Thunk functions
 
 export const updateSearchedStock = createAsyncThunk(
   "stockList/updateSearchedStock",
   async (searchedTerm: string) => {
+    console.log(searchedTerm);
     try {
       const response = await axios({
         method: "GET",
-        url: `https://api.tiingo.com/tiingo/daily/${searchedTerm}/prices&token=${'c4e8ededfe71cae60c7987fe4430bc4c9b7daeb6'}`,
-        headers: {
-          'mode': "CORS",
-          'Content-Type': 'application/json'
+        url: `http://localhost:8000/`,
+        params: {
+          stockName: searchedTerm
         }
       });  
       console.log(response.data);
+      // updateStockInfo(response.data);
+      return Promise.resolve(response.data);
       }
       catch(err) {
         console.log(err);
+        return Promise.reject(err);
       }
-
-      return null
   }
 );
+
+// Creating the Store Slice
+const searchBarReducer = createSlice({
+  name: "stockList",
+  initialState,
+  reducers: {
+    updateStockInfo(state, action: PayloadAction<stockInfo>) {
+      state.stockInfo = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(updateSearchedStock.fulfilled, (state, action: PayloadAction<stockInfo>) => {
+      state.stockInfo = action.payload;
+      state.searchedStock = action.payload.stockName
+      state.status = "succeeded";
+    })
+  }
+});
 
 export default searchBarReducer.reducer;
 export const { updateStockInfo } =
