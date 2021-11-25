@@ -2,11 +2,14 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 interface stockInfo {
-  stockName: string,
-  price: number,
-  dayLow: number,
-  dayHigh: number,
-  percentageChange: number,
+  stockName: string;
+  price: number;
+  dayLow: number;
+  dayHigh: number;
+  percentageChange: number;
+  marketVolume: number;
+  fiftyTwoWeekLow: number;
+  fiftyTwoWeekHigh: number;
 }
 
 interface stockState {
@@ -29,7 +32,6 @@ const initialState: stockState = {
 export const updateSearchedStock = createAsyncThunk(
   "stockList/updateSearchedStock",
   async (searchedTerm: string) => {
-    console.log(searchedTerm);
     try {
       const response = await axios({
         method: "GET",
@@ -63,6 +65,12 @@ const searchBarReducer = createSlice({
       state.stockInfo = action.payload;
       state.searchedStock = action.payload.stockName
       state.status = "succeeded";
+    });
+    builder.addCase(updateSearchedStock.pending, (state, action) => {
+      state.status = "loading";
+    });
+    builder.addCase(updateSearchedStock.rejected, (state, action) => {
+      state.status = "failed";
     })
   }
 });

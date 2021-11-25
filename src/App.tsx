@@ -4,8 +4,8 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import { Typography } from "@mui/material";
-import Base from "./Components/StockPage/Base";
+import StockBase from "./Components/StockPage/StockBase";
+import AboutBase from "./Components/About/AboutBase";
 
 function App() {
 
@@ -22,15 +22,12 @@ function App() {
           </Route>
           <Route path="/stock">
             <div style={{fontSize: "24px", padding: "1rem"}}>
-              <Base />
+              <StockBase />
             </div>
           </Route>
           <Route path="/about">
-            <div style={{fontSize: "24px", padding: "1rem"}}>
-            <Typography variant="h3" align="center" style={{paddingTop: "34"}}>
-              Financial Market Analysis Platform
-            </Typography>  
-            </div></Route>  
+            <AboutBase />
+            </Route>
         </Switch>
       </Router>
     </div>
