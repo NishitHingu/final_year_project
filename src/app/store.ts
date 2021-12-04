@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import autocompleteSearchBar from '../features/searchBar/autocompleteSearchBar';
+import stock from '../features/searchBar/Stock';
 
 export const store = configureStore({
   reducer:{
-    autocompleteSearchBar
+    stock
   }
 });
 

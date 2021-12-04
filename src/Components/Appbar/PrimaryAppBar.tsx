@@ -7,8 +7,8 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Autocomplete, Button, Grid, TextField } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { updateSearchedStock } from "../../features/searchBar/autocompleteSearchBar";
+import { getStockList, useAppDispatch } from "../../app/hooks";
+import { getHistoricalStockData, getSearchedStockInfo } from "../../features/searchBar/Stock";
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
   color: theme.palette.getContrastText(theme.palette.primary.main),
@@ -63,14 +63,13 @@ const StyledInputBase = styled(TextField)(({ theme }) => ({
 export default function PrimaryAppBar(props: { name: string }) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const dispatch = useAppDispatch();
-  const searchOptions = useAppSelector(
-    (state) => state.autocompleteSearchBar.stockList
-  );
+  const searchOptions = getStockList();
   const history = useHistory();
 
   const handleSearch = () => {
     console.log(searchTerm);
-    dispatch(updateSearchedStock(searchTerm));
+    dispatch(getSearchedStockInfo(searchTerm));
+    dispatch(getHistoricalStockData(searchTerm));
     setSearchTerm("");
     history.push("/stock");
   };

@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../../app/hooks";
+import { getStockInfo } from "../../app/hooks";
 
 const CustomSlider = styled(Slider)(({min, max, theme }) => ({
 	color: "green",
@@ -28,9 +28,7 @@ const CustomSlider = styled(Slider)(({min, max, theme }) => ({
 }))
 
 export default function HighLowSlider() {
-  const stockInfo = useAppSelector(
-    (state) => state.autocompleteSearchBar.stockInfo
-  );
+  const stockInfo = getStockInfo();
   const [price, setPrice] = useState(stockInfo?.price);
 
   useEffect(() => {

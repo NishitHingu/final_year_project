@@ -1,11 +1,9 @@
 import { Grid, Typography } from "@mui/material";
-import { useAppSelector } from "../../app/hooks";
+import { getStockInfo } from "../../app/hooks";
 import HighLowSlider from "./HighLowSlider";
 
 function StockDetails() {
-  const stockInfo = useAppSelector(
-    (state) => state.autocompleteSearchBar.stockInfo
-  );
+  const stockInfo = getStockInfo();
 
   function DisplayPercentageChange() {
     if (stockInfo?.percentageChange && stockInfo.percentageChange >= 0) {

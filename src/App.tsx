@@ -17,7 +17,6 @@ function App() {
           <Route path="/home">
             <div style={{fontSize: "24px", padding: "1rem"}}>
               Home
-                
             </div>
           </Route>
           <Route path="/stock">
