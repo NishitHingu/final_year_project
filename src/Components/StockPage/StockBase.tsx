@@ -1,17 +1,18 @@
 import { Grid } from "@mui/material";
-import { getStockInfoStatus } from "../../app/hooks";
+import { getHistoricalStockDataStatus, getStockInfoStatus } from "../../app/hooks";
+import MiniAreaGraph from "./MiniAreaGraph";
 import StockDetails from "./StockDetails";
 
 export default function StockBase() {
-  const loading = getStockInfoStatus();
-  console.log(loading);
-
+  const stockInfoStatus = getStockInfoStatus();
+  const historicalStockDataStatus = getHistoricalStockDataStatus();
   return (
     <Grid container justifyContent="space-between">
       <Grid item xs={12} md={7}>
-        {(loading === 'succeeded') ? <StockDetails /> : (loading)}
+        {(stockInfoStatus === 'succeeded') ? <StockDetails /> : (stockInfoStatus)}
       </Grid>
       <Grid item xs={12} md={4}>
+        {(historicalStockDataStatus === 'succeeded') ? <MiniAreaGraph /> : (historicalStockDataStatus)}
       </Grid>
     </Grid>
   );

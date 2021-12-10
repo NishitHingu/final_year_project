@@ -40,8 +40,8 @@ const initialState: stockState = {
 
 // Async Thunk functions
 
-export const getSearchedStockInfo = createAsyncThunk(
-  "stock/getSearchedStockInfo",
+export const fetchSearchedStockInfo = createAsyncThunk(
+  "stock/fetchSearchedStockInfo",
   async (searchTerm: string) => {
     try {
       const response = await axios({
@@ -60,8 +60,8 @@ export const getSearchedStockInfo = createAsyncThunk(
   }
 );
 
-export const getHistoricalStockData = createAsyncThunk(
-  "stock/getHistoricalStockData",
+export const fetchHistoricalStockData = createAsyncThunk(
+  "stock/fetchHistoricalStockData",
   async (searchTerm: string) => {
     try {
       let year = new Date().getFullYear() - 10;
@@ -96,14 +96,14 @@ const stock = createSlice({
   },
   extraReducers: (builder) => {
     // Builder function to update state accourding to the Stock information data fetch progress
-    builder.addCase(getSearchedStockInfo.pending, (state, action) => {
+    builder.addCase(fetchSearchedStockInfo.pending, (state, action) => {
       state.stockInfoStatus = "loading";
     });
-    builder.addCase(getSearchedStockInfo.rejected, (state, action) => {
+    builder.addCase(fetchSearchedStockInfo.rejected, (state, action) => {
       state.stockInfoStatus = "failed";
     });
     builder.addCase(
-      getSearchedStockInfo.fulfilled,
+      fetchSearchedStockInfo.fulfilled,
       (state, action: PayloadAction<stockInfo>) => {
         state.stockInfo = action.payload;
         state.searchedStock = action.payload.stockName;
@@ -112,14 +112,14 @@ const stock = createSlice({
     );
 
     // Builder function to update state accourding to the Historical data fetch progress
-    builder.addCase(getHistoricalStockData.pending, (state, action) => {
+    builder.addCase(fetchHistoricalStockData.pending, (state, action) => {
       state.historicalDataStatus = "loading";
     });
-    builder.addCase(getHistoricalStockData.rejected, (state, action) => {
+    builder.addCase(fetchHistoricalStockData.rejected, (state, action) => {
       state.historicalDataStatus = "failed";
     });
     builder.addCase(
-      getHistoricalStockData.fulfilled,
+      fetchHistoricalStockData.fulfilled,
       (state, action: PayloadAction<historicalStockData[]>) => {
         state.historicalData = action.payload;
         state.historicalDataStatus = "succeeded";
