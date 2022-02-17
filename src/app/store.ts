@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import stock from '../features/searchBar/Stock';
+import creatorInfo from '../features/creator/creatorInfo';
 
 export const store = configureStore({
   reducer:{
-    stock
+    stock,
+    creatorInfo,
   }
 });
 

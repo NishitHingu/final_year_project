@@ -10,6 +10,8 @@ export const getStockInfo = () => useAppSelector(state => state.stock.stockInfo)
 export const getStockInfoStatus = () => useAppSelector(state => state.stock.stockInfoStatus);
 export const getHistoricalStockData = () => useAppSelector(state => state.stock.historicalData);
 export const getHistoricalStockDataStatus = () => useAppSelector(state => state.stock.historicalDataStatus);
+export const getStockNews = () => useAppSelector(state => state.stock.stockNews);
+export const getStockNewsStatus = () => useAppSelector(state => state.stock.stockNewsStatus);
 
 export const getHistoricalClosePriceData = () => {
     const data = useAppSelector(state => state.stock.historicalData);
@@ -20,3 +22,16 @@ export const getHistoricalClosePriceData = () => {
     });
     return formattedData;
 }
+
+export const getCandleStickData = () => {
+    const data = useAppSelector(state => state.stock.historicalData);
+    let formattedData: {x: Date, y: number[]}[] | undefined = data?.map(item => {
+        let date = new Date(item.date);
+        let price = [item.open, item.high, item.low, item.close];
+        return { x: date, y: price }
+    });
+    console.log(formattedData);
+    return formattedData;
+}
+
+export const getCreatorInfo = () => useAppSelector(state => state.creatorInfo);

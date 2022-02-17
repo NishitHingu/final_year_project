@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-interface stockInfo {
+export interface stockInfo {
   stockName: string;
   price: number;
   dayLow: number;
@@ -12,7 +12,7 @@ interface stockInfo {
   fiftyTwoWeekHigh: number;
 }
 
-interface historicalStockData {
+export interface historicalStockData {
   date: string;
   open: number;
   high: number;
@@ -22,13 +22,27 @@ interface historicalStockData {
   volume: number;
 }
 
+export interface stockNews {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  author: string;
+  image: string;
+  language: string;
+  category: string[];
+  published: string;
+}
+
 interface stockState {
   stockList: string[];
   searchedStock: string | null;
   stockInfo: stockInfo | null;
-  historicalData: historicalStockData[] | null;
   stockInfoStatus?: "idle" | "loading" | "succeeded" | "failed";
+  historicalData: historicalStockData[] | null;
   historicalDataStatus?: "idle" | "loading" | "succeeded" | "failed";
+  stockNews: stockNews[] | null,
+  stockNewsStatus? : "idle" | "loading" | "succeeded" | "failed";
 }
 
 const initialState: stockState = {
@@ -36,10 +50,12 @@ const initialState: stockState = {
   searchedStock: null,
   stockInfo: null,
   historicalData: null,
+  stockNews: null,
 };
 
 // Async Thunk functions
 
+// Make a request to our backend server to get the deatials of the stock.
 export const fetchSearchedStockInfo = createAsyncThunk(
   "stock/fetchSearchedStockInfo",
   async (searchTerm: string) => {
@@ -60,11 +76,37 @@ export const fetchSearchedStockInfo = createAsyncThunk(
   }
 );
 
+// Fetches news from the currents API for news: https://currentsapi.services/en/docs/search.
+export const fetchStockNews = createAsyncThunk(
+  "stock/fetchStockNews",
+  async (searchTerm: string) => {
+    try {
+      const response = await axios({
+        method: "GET",
+        url: `https://api.currentsapi.services/v1/search`,
+        params: {
+          keywords: "tcs",
+          country: "IN", 
+          category: "finance",
+          apiKey: "gubAap9HS5s5lmtGfqPmc6hn6SQJ6JxUBiSdefN3cgJD3Gxo",
+          limit: 20,
+        }
+      });
+      console.log(response.data.news);
+      return Promise.resolve(response.data.news);
+    } catch (err) {
+      console.log(err);
+      return Promise.reject(err);
+    }
+  }
+);
+
+// Gets the historical data from our backend server
 export const fetchHistoricalStockData = createAsyncThunk(
   "stock/fetchHistoricalStockData",
   async (searchTerm: string) => {
     try {
-      let year = new Date().getFullYear() - 10;
+      let year = new Date().getFullYear() - 1;
       let month = new Date().getMonth() + 1;
       let day = new Date().getDate();
       let startDate: string = `${year}-${month}-${day}`;
@@ -104,7 +146,7 @@ const stock = createSlice({
     });
     builder.addCase(
       fetchSearchedStockInfo.fulfilled,
-      (state, action: PayloadAction<stockInfo>) => {
+      (state, action) => {
         state.stockInfo = action.payload;
         state.searchedStock = action.payload.stockName;
         state.stockInfoStatus = "succeeded";
@@ -120,9 +162,23 @@ const stock = createSlice({
     });
     builder.addCase(
       fetchHistoricalStockData.fulfilled,
-      (state, action: PayloadAction<historicalStockData[]>) => {
+      (state, action) => {
         state.historicalData = action.payload;
         state.historicalDataStatus = "succeeded";
+      }
+    );
+    builder.addCase(fetchStockNews.pending, (state, action) => {
+      state.stockNewsStatus = "loading";
+    });
+    builder.addCase(fetchStockNews.rejected, (state, action) => {
+      state.stockNewsStatus = "failed";
+    });
+    builder.addCase(
+      fetchStockNews.fulfilled,
+      // Some issue with the action type that i dont understand currently will fix it later: https://github.com/reduxjs/redux-toolkit/issues/1707
+      (state, action: any) => {
+        state.stockNews = action.payload;
+        state.stockNewsStatus = "succeeded";
       }
     );
   },

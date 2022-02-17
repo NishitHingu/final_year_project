@@ -8,8 +8,13 @@ import { getStockInfo } from "../../app/hooks";
 const CustomSlider = styled(Slider)(({min, max, theme }) => ({
 	color: "green",
 	'& .Mui-disabled': {
-		color: theme.palette.text.primary,
+		color: theme.palette.getContrastText(theme.palette.background.default),
+    top: "40%",
+    height: "15px",
+    width: "15px",
 	},
+  '.css-eg0mwd-MuiSlider-thumb': {
+  },
 	'&::before': {
 		content: `"${min}"`,
 		fontSize: 12,
