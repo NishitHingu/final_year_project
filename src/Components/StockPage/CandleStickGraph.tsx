@@ -20,10 +20,10 @@ const CandleStickGraph = () => {
       tooltip: {
         enabled: true,
       },
-      title: {
-        text: "Advance Graph",
-        align: "left",
-      },
+      // title: {
+      //   text: "Advance Graph",
+      //   align: "left",
+      // },
       xaxis: {
         type: "category",
         labels: {

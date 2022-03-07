@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+// import { response } from "./newsData";
 
 export interface stockInfo {
   stockName: string;
@@ -13,14 +14,17 @@ export interface stockInfo {
 }
 
 export interface historicalStockData {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  adjClose: number;
-  volume: number;
-}
+  x: Date, 
+  y: number[]
+  // date: string;
+  // open: number;
+  // high: number;
+  // low: number;
+  // close: number;
+  // adjClose: number;
+  // volume: number;
+// }
+};
 
 export interface stockNews {
   id: string;
@@ -46,7 +50,7 @@ interface stockState {
 }
 
 const initialState: stockState = {
-  stockList: ["MRF", "TSLA", "TCS", "FB", "SUNO", "CL", "INFY"],
+  stockList: ["MRF.NS", "TSLA", "TCS", "FB", "SUNO", "CL", "INFY"],
   searchedStock: null,
   stockInfo: null,
   historicalData: null,
@@ -62,7 +66,7 @@ export const fetchSearchedStockInfo = createAsyncThunk(
     try {
       const response = await axios({
         method: "GET",
-        url: `http://localhost:8000/quote`,
+        url: `http://localhost:8001/quote`,
         params: {
           stockName: searchTerm,
         },
@@ -85,7 +89,7 @@ export const fetchStockNews = createAsyncThunk(
         method: "GET",
         url: `https://api.currentsapi.services/v1/search`,
         params: {
-          keywords: "tcs",
+          keywords: "mrf",
           country: "IN", 
           category: "finance",
           apiKey: "gubAap9HS5s5lmtGfqPmc6hn6SQJ6JxUBiSdefN3cgJD3Gxo",
@@ -106,20 +110,20 @@ export const fetchHistoricalStockData = createAsyncThunk(
   "stock/fetchHistoricalStockData",
   async (searchTerm: string) => {
     try {
-      let year = new Date().getFullYear() - 1;
-      let month = new Date().getMonth() + 1;
-      let day = new Date().getDate();
-      let startDate: string = `${year}-${month}-${day}`;
-      const result = await axios({
+      // let year = new Date().getFullYear() - 1;
+      // let month = new Date().getMonth() + 1;
+      // let day = new Date().getDate();
+      // let startDate: string = `${year}-${month}-${day}`;
+      const response = await axios({
         method: "GET",
-        url: `http://localhost:8000/historical`,
-        params: {
-          stockName: searchTerm,
-          startDate,
-        },
+        url: `http://localhost:8000/stock/${searchTerm}/356`,
+        // params: {
+        //   stockName: searchTerm,
+        //   startDate,
+        // },
       });
-      console.log(result.data);
-      return Promise.resolve(result.data);
+      const result = JSON.parse(response.data);
+      return Promise.resolve(result);
     } catch (err) {
       console.log(err);
       return Promise.reject(err);
