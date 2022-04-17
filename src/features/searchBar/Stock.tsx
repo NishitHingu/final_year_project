@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-// import { response } from "./newsData";
+import stockNameList from "../../media/jsonData/StockList.json";
+import currency_map from "../../media/jsonData/Country_Currency_map.json";
 
 export interface stockInfo {
   stockName: string;
@@ -11,19 +12,12 @@ export interface stockInfo {
   marketVolume: number;
   fiftyTwoWeekLow: number;
   fiftyTwoWeekHigh: number;
+  financialCurrency: string;
 }
 
 export interface historicalStockData {
   x: Date, 
   y: number[]
-  // date: string;
-  // open: number;
-  // high: number;
-  // low: number;
-  // close: number;
-  // adjClose: number;
-  // volume: number;
-// }
 };
 
 export interface stockNews {
@@ -38,8 +32,13 @@ export interface stockNews {
   published: string;
 }
 
+export interface StockList {
+  Ticker: string;
+  Name: string;
+}
+
 interface stockState {
-  stockList: string[];
+  stockList: StockList[];
   searchedStock: string | null;
   stockInfo: stockInfo | null;
   stockInfoStatus?: "idle" | "loading" | "succeeded" | "failed";
@@ -50,7 +49,7 @@ interface stockState {
 }
 
 const initialState: stockState = {
-  stockList: ["MRF.NS", "TSLA", "TCS", "FB", "SUNO", "CL", "INFY"],
+  stockList: stockNameList,
   searchedStock: null,
   stockInfo: null,
   historicalData: null,
@@ -66,13 +65,11 @@ export const fetchSearchedStockInfo = createAsyncThunk(
     try {
       const response = await axios({
         method: "GET",
-        url: `http://localhost:8001/quote`,
-        params: {
-          stockName: searchTerm,
-        },
+        url: `http://localhost:8000/tickInfo/${searchTerm}`,
       });
       console.log(response.data);
-      return Promise.resolve(response.data);
+      return Promise.resolve(JSON.parse(response.data));
+      
     } catch (err) {
       console.log(err);
       return Promise.reject(err);
@@ -89,7 +86,7 @@ export const fetchStockNews = createAsyncThunk(
         method: "GET",
         url: `https://api.currentsapi.services/v1/search`,
         params: {
-          keywords: "mrf",
+          keywords: "tcs",
           country: "IN", 
           category: "finance",
           apiKey: "gubAap9HS5s5lmtGfqPmc6hn6SQJ6JxUBiSdefN3cgJD3Gxo",

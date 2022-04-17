@@ -10,9 +10,9 @@ const CustomGrid = styled(Grid)(({ theme }) => ({
   padding: "1rem",
 }));
 
-interface BaseProps {}
+interface AboutBaseProps {}
 
-const Base: FunctionComponent<BaseProps> = (props) => {
+const AboutBase: FunctionComponent<AboutBaseProps> = (props) => {
   return (
     <Grid container justifyContent="center">
       <Grid item xs={12}>
@@ -83,4 +83,4 @@ const Base: FunctionComponent<BaseProps> = (props) => {
   );
 };
 
-export default Base;
+export default AboutBase;

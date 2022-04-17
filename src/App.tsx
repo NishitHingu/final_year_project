@@ -1,18 +1,18 @@
 import PrimaryAppBar from "./Components/Appbar/PrimaryAppBar";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import StockBase from "./Components/StockPage/StockBase";
 import AboutBase from "./Components/About/AboutBase";
+import { getSearchedStock } from "./app/hooks";
 
 function App() {
+  let searchedStock = getSearchedStock();
+  console.log(searchedStock);
 
   return (
     <div className="App">
-      <Router>
-        <PrimaryAppBar name="nishit"/>
+      <PrimaryAppBar name="nishit" />
+      {searchedStock && <StockBase />}
+      {/* <Router>
         <Switch>
           <Route path="/home">
             <div style={{fontSize: "24px", padding: "1rem"}}>
@@ -28,7 +28,7 @@ function App() {
             <AboutBase />
             </Route>
         </Switch>
-      </Router>
+      </Router> */}
     </div>
   );
 }

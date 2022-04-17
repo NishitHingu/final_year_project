@@ -1,18 +1,33 @@
-import { useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
+import { HTMLAttributes, useState } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Autocomplete, Button, Grid, TextField } from "@mui/material";
+import { Autocomplete, Button, Collapse, Grid, TextField } from "@mui/material";
 import { getStockList, useAppDispatch } from "../../app/hooks";
-import { fetchHistoricalStockData, fetchSearchedStockInfo, fetchStockNews } from "../../features/searchBar/Stock";
+import {
+  fetchHistoricalStockData,
+  fetchSearchedStockInfo,
+  fetchStockNews,
+  StockList,
+} from "../../features/searchBar/Stock";
+import { matchSorter } from "match-sorter";
+import CircularProgress from "@mui/material/CircularProgress";
 
-const StyledNavLink = styled(NavLink)(({ theme }) => ({
-  color: theme.palette.getContrastText(theme.palette.primary.main),
-  textDecoration: "none",
+// const StyledNavLink = styled(NavLink)(({ theme }) => ({
+//   color: theme.palette.getContrastText(theme.palette.primary.main),
+//   textDecoration: "none",
+// }));
+
+const CustomFlexCollapse = styled(Collapse)((props) => ({
+  display: "flex",
+  backgroundColor: "whitesmoke",
+  borderBottom: "1pz solid black",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh",
 }));
 
 const Search = styled("div")(({ theme }) => ({
@@ -60,84 +75,170 @@ const StyledInputBase = styled(TextField)(({ theme }) => ({
   // },
 }));
 
+function determineIfStringOrStockList(
+  toBeDetermined: StockList | string | null
+): toBeDetermined is StockList {
+  if ((toBeDetermined as StockList).Ticker) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export default function PrimaryAppBar(props: { name: string }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [collapseSearch, setCollapseSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentSearchedString, setCurrentSearchedString] = useState("");
   const dispatch = useAppDispatch();
   const searchOptions = getStockList();
-  const history = useHistory();
 
   const handleSearch = () => {
     console.log(searchTerm);
+    setCollapseSearch(true);
     dispatch(fetchSearchedStockInfo(searchTerm));
     dispatch(fetchHistoricalStockData(searchTerm));
     dispatch(fetchStockNews(searchTerm));
     setSearchTerm("");
-    history.push("/stock");
   };
 
+  const filterOptionsAutoComplete = (
+    options: StockList[],
+    { inputValue }: any
+  ) => {
+    // searching the final list which we get in the options object
+    if (inputValue === null) return options;
+    let result = options;
+    result = matchSorter(result, inputValue, { keys: ["Name", "Ticker"] });
+    console.log(result);
+    return result;
+  };
+
+  const handleSearchChange = (
+    event: any,
+    newValue: string | StockList | null
+  ) => {
+    if (newValue === null) {
+      setSearchTerm("");
+    } else if (determineIfStringOrStockList(newValue)) {
+      setSearchTerm(newValue?.Ticker ? newValue?.Ticker : "");
+    } else if (typeof newValue === "string") {
+      setSearchTerm(newValue);
+    }
+    console.log(newValue);
+  };
+
+  const renderOption = (
+    // props is not typedefed as HTMLAttributes<HTMLLIElement> here bcz HTMLAttributes<HTMLLIElement> does not have the key attribute
+    // which we need to modify here. props has the key attribute.
+    props: any,
+    options: StockList
+  ) => {
+    props.key = options.Ticker;
+    return (
+      <Box
+        component="li"
+        sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+        {...props}
+      >
+        {options.Ticker}: {options.Name}
+      </Box>
+    );
+  };
+
+  console.log(searchTerm);
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" style={{ padding: "0.25rem 1rem" }}>
-        <Grid container alignItems="center">
-          <Grid item xs={12} sm={9}>
-            <Grid
-              container
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="space-around"
-            >
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                sx={{ mr: 2 }}
+    <CustomFlexCollapse
+      in={collapseSearch}
+      collapsedSize={100}
+      sx={{ flexGrow: 1 }}
+      timeout={1000}
+    >
+      {/* <Collapse in={collapseSearch} collapsedSize={100} sx={{ flexGrow: 1 }} style={{height: "100vh", backgroundColor:"gray"}}> */}
+      {/* <Grid container flexGrow={1} alignItems="center" justifyContent="center"> */}
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="space-around"
+        marginBottom={collapseSearch ? 0 : 20}
+        flexDirection={collapseSearch ? "row" : "column"}
+      >
+        <Grid item>
+          <Typography
+            variant={!collapseSearch ? "h3" : "h6"}
+            textAlign="center"
+            margin={!collapseSearch ? 5 : 2}
+            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
+          >
+            Stnks
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="row"
+          >
+            <Autocomplete
+              inputValue={currentSearchedString}
+              freeSolo
+              // open={true}
+              loading={isLoading}
+              onChange={handleSearchChange}
+              size="medium"
+              options={searchOptions}
+              onInputChange={(e, value) => setCurrentSearchedString(value)}
+              filterOptions={filterOptionsAutoComplete}
+              getOptionLabel={(option) => option.Name}
+              renderOption={renderOption}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  hiddenLabel
+                  style={{ backgroundColor: "whitesmoke" }}
+                  variant="outlined"
+                  placeholder="Search…"
+                  sx={{ width: 300 }}
+                />
+              )}
+              // renderInput={(params) => (
+              //   <TextField
+              //     {...params}
+              //     placeholder="Search"
+              //     variant="outlined"
+              //     autoFocus
+              //     style={{ backgroundColor: "whitesmoke" }}
+              //     sx={{ width: 300 }}
+              //     InputProps={{
+              //       ...params.InputProps,
+              //       endAdornment: (
+              //         <>
+              //           {isLoading ? (
+              //             <CircularProgress color="inherit" size={20} />
+              //           ) : null}
+              //           {params.InputProps.endAdornment}
+              //         </>
+              //       ),
+              //     }}
+              //   />
+              // )}
+            />
+            <Grid item style={{ paddingLeft: "2rem" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleSearch()}
               >
-                <MenuIcon />
-              </IconButton>
-              <Typography
-                variant="h6"
-                noWrap
-                component="span"
-                sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-              >
-                Stnks
-              </Typography>
-              <Autocomplete
-                value={searchTerm}
-                onChange={(event, newValue) => {
-                  if (typeof newValue === "string") {
-                    setSearchTerm(newValue);
-                  }
-                  console.log(newValue);
-                }}
-                size="small"
-                options={searchOptions}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    hiddenLabel
-                    style={{ backgroundColor: "whitesmoke" }}
-                    variant="outlined"
-                    placeholder="Search…"
-                    sx={{ width: 300 }}
-                  />
-                )}
-              />
-              <div style={{ flexGrow: 1, paddingLeft: "2rem" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleSearch()}
-                >
-                  Search
-                </Button>
-              </div>
+                Search
+              </Button>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={3}>
+        </Grid>
+      </Grid>
+      {/* <Grid item xs={12} sm={3}>
             <Grid container justifyContent="space-around" alignItems="center">
-              <StyledNavLink activeStyle={{ fontSize: "1.2rem" }} to="/home">
+            <StyledNavLink activeStyle={{ fontSize: "1.2rem" }} to="/home">
                 Home
               </StyledNavLink>
               <StyledNavLink activeStyle={{ fontSize: "1.2rem" }} to="/stock">
@@ -147,9 +248,9 @@ export default function PrimaryAppBar(props: { name: string }) {
                 About
               </StyledNavLink>
             </Grid>
-          </Grid>
-        </Grid>
-      </AppBar>
-    </Box>
+          </Grid> */}
+      {/* </Grid> */}
+      {/* </Collapse> */}
+    </CustomFlexCollapse>
   );
 }

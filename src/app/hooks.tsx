@@ -12,6 +12,7 @@ export const getHistoricalStockData = () => useAppSelector(state => state.stock.
 export const getHistoricalStockDataStatus = () => useAppSelector(state => state.stock.historicalDataStatus);
 export const getStockNews = () => useAppSelector(state => state.stock.stockNews);
 export const getStockNewsStatus = () => useAppSelector(state => state.stock.stockNewsStatus);
+export const getSearchedStock = () => useAppSelector(state => state.stock.searchedStock);
 
 export const getHistoricalClosePriceData = () => {
     // const data = useAppSelector(state => state.stock.historicalData);
