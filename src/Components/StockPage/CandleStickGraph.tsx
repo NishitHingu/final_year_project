@@ -103,12 +103,12 @@ const CandleStickGraph = () => {
         </Popper>
       </Box> */}
       {/* <Button onClick={handleClick("bottom")}>bottom</Button> */}
-      <Grid container justifyContent="center">
+      <Grid container justifyContent="center" style={{height:"70vh", width: "90vw"}}>
         <Chart
           options={options}
           series={[{ data: data }]}
-          width="80%"
-          // height="60vh"
+          width="90%"
+          height="100%"
           type="candlestick"
         ></Chart>
 
