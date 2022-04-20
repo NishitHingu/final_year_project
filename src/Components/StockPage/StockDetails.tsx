@@ -7,7 +7,9 @@ function StockDetails() {
   const stockInfo = getStockInfo();
 
   function DisplayPercentageChange() {
-    let percentageChange = stockInfo?.percentageChange ? stockInfo?.percentageChange.toPrecision(4) : 0;
+    let percentageChange = stockInfo?.percentageChange
+      ? stockInfo?.percentageChange.toPrecision(4)
+      : 0;
     if (percentageChange >= 0) {
       return (
         <Typography variant="body1" color="green">
@@ -23,10 +25,20 @@ function StockDetails() {
     }
     return null;
   }
-  
-  const getCurrencySymbol = (country: string | undefined, map: {[key: string]: any}) => {
-    return country ? map[country] : "$";
+
+  function convertUnicode(input: string) {
+    return input.replace(/\\u[0-9a-fA-F]{4}/g, function (a, b) {
+      var charcode = parseInt(b, 16);
+      return String.fromCharCode(charcode);
+    });
   }
+
+  const getCurrencySymbol = (
+    country: string | undefined,
+    map: { [key: string]: any }
+  ) => {
+    return country ? convertUnicode(map[country]) : "$";
+  };
 
   return (
     <Grid container margin={2}>
@@ -34,7 +46,17 @@ function StockDetails() {
         <Typography variant="h4" marginBottom={2}>
           {stockInfo?.stockName}
         </Typography>
-        <Typography variant="h2">{getCurrencySymbol(stockInfo?.financialCurrency, countryCurrencyMap)}{stockInfo?.price}</Typography>
+        <Typography variant="h2">
+          <span
+            dangerouslySetInnerHTML={{
+              __html: getCurrencySymbol(
+                stockInfo?.financialCurrency,
+                countryCurrencyMap
+              ),
+            }}
+          ></span>
+          {stockInfo?.price}
+        </Typography>
         <DisplayPercentageChange />
         <Typography variant="body2">
           As on {new Date().toDateString()} | {new Date().toLocaleTimeString()}

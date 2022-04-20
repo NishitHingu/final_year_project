@@ -9,12 +9,13 @@ import { Autocomplete, Button, Collapse, Grid, TextField } from "@mui/material";
 import { getStockList, useAppDispatch } from "../../app/hooks";
 import {
   fetchHistoricalStockData,
-  fetchSearchedStockInfo,
+  fetchSearchedStockInfoAndNews,
   fetchStockNews,
   StockList,
 } from "../../features/searchBar/Stock";
 import { matchSorter } from "match-sorter";
 import CircularProgress from "@mui/material/CircularProgress";
+import Tooltip from "@mui/material/Tooltip";
 
 // const StyledNavLink = styled(NavLink)(({ theme }) => ({
 //   color: theme.palette.getContrastText(theme.palette.primary.main),
@@ -96,10 +97,11 @@ export default function PrimaryAppBar(props: { name: string }) {
   const handleSearch = () => {
     console.log(searchTerm);
     setCollapseSearch(true);
-    dispatch(fetchSearchedStockInfo(searchTerm));
+    dispatch(fetchSearchedStockInfoAndNews(searchTerm));
     dispatch(fetchHistoricalStockData(searchTerm));
-    dispatch(fetchStockNews(searchTerm));
+    // dispatch(fetchStockNews(searchTerm));
     setSearchTerm("");
+    setCurrentSearchedString("");
   };
 
   const filterOptionsAutoComplete = (
@@ -146,7 +148,16 @@ export default function PrimaryAppBar(props: { name: string }) {
     );
   };
 
-  console.log(searchTerm);
+  const noOptionComponent = (
+    <Typography variant="body1">
+      <div>Ticker format:</div>
+      <Typography variant="body1" component={"span"} color={"lightcyan"}>Ticker</Typography>
+      <Typography variant="body1" component={"span"} color={"orange"}>
+        .ExchangeAbbreviation (optional, default US exchange)
+      </Typography>
+    </Typography>
+  );
+
   return (
     <CustomFlexCollapse
       in={collapseSearch}
@@ -180,6 +191,8 @@ export default function PrimaryAppBar(props: { name: string }) {
             alignItems="center"
             flexDirection="row"
           >
+            <Tooltip title={noOptionComponent}>
+
             <Autocomplete
               inputValue={currentSearchedString}
               freeSolo
@@ -192,6 +205,7 @@ export default function PrimaryAppBar(props: { name: string }) {
               filterOptions={filterOptionsAutoComplete}
               getOptionLabel={(option) => option.Name}
               renderOption={renderOption}
+              noOptionsText={"noOptionComponent"}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -202,28 +216,8 @@ export default function PrimaryAppBar(props: { name: string }) {
                   sx={{ width: 300 }}
                 />
               )}
-              // renderInput={(params) => (
-              //   <TextField
-              //     {...params}
-              //     placeholder="Search"
-              //     variant="outlined"
-              //     autoFocus
-              //     style={{ backgroundColor: "whitesmoke" }}
-              //     sx={{ width: 300 }}
-              //     InputProps={{
-              //       ...params.InputProps,
-              //       endAdornment: (
-              //         <>
-              //           {isLoading ? (
-              //             <CircularProgress color="inherit" size={20} />
-              //           ) : null}
-              //           {params.InputProps.endAdornment}
-              //         </>
-              //       ),
-              //     }}
-              //   />
-              // )}
             />
+          </Tooltip>
             <Grid item style={{ paddingLeft: "2rem" }}>
               <Button
                 variant="contained"

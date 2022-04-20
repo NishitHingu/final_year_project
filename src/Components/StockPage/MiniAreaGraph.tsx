@@ -56,6 +56,32 @@ function MiniAreaGraph() {
           );
           break;
 
+        case "3M":
+          dataSlice = getDataSlice(
+            closePrices,
+            new Date().getTime() - 2629743000 * 3
+          );
+          colors =
+            dataSlice[dataSlice.length - 1][1] - dataSlice[0][1] < 0
+              ? ["#f28b82"]
+              : ["#81c995"];
+          ApexCharts.exec(
+            "HistoricalMiniAreaGraph",
+            "updateOptions",
+            {
+              series: [
+                {
+                  data: dataSlice,
+                },
+              ],
+              colors,
+              fill: {
+                colors,
+              },
+            },
+            true
+          );
+          break;
         case "6M":
           dataSlice = getDataSlice(
             closePrices,
@@ -108,33 +134,7 @@ function MiniAreaGraph() {
             true
           );
           break;
-        case "5Y":
-          dataSlice = getDataSlice(
-            closePrices,
-            new Date().getTime() - 31556926000 * 5
-          );
-          colors =
-            dataSlice[dataSlice.length - 1][1] - dataSlice[0][1] < 0
-              ? ["#f28b82"]
-              : ["#81c995"];
-          ApexCharts.exec(
-            "HistoricalMiniAreaGraph",
-            "updateOptions",
-            {
-              series: [
-                {
-                  data: dataSlice,
-                },
-              ],
-              colors,
-              fill: {
-                colors,
-              },
-            },
-            true
-          );
-          break;
-        case "10Y":
+        case "Max":
           dataSlice = getDataSlice(
             closePrices,
             new Date().getTime() - 31556926000 * 10
@@ -226,6 +226,12 @@ function MiniAreaGraph() {
             1M
           </Button>
           <Button
+            onClick={() => updateDataPeriod("3M")}
+            className={dataPeriod === "3M" ? classes.activeBtn : undefined}
+          >
+            3M
+          </Button>
+          <Button
             onClick={() => updateDataPeriod("6M")}
             className={dataPeriod === "6M" ? classes.activeBtn : undefined}
           >
@@ -236,18 +242,6 @@ function MiniAreaGraph() {
             className={dataPeriod === "1Y" ? classes.activeBtn : undefined}
           >
             1Y
-          </Button>
-          <Button
-            onClick={() => updateDataPeriod("5Y")}
-            className={dataPeriod === "5Y" ? classes.activeBtn : undefined}
-          >
-            5Y
-          </Button>
-          <Button
-            onClick={() => updateDataPeriod("10Y")}
-            className={dataPeriod === "10Y" ? classes.activeBtn : undefined}
-          >
-            10Y
           </Button>
         </ButtonGroup>
       </Grid>

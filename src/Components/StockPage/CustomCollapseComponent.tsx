@@ -20,7 +20,7 @@ const CustomCollapseComponent: FunctionComponent<
         onClick={() => setHide(!hide)}
         justifyContent="space-between"
         alignItems="center"
-        style={{ paddingRight: "1.5rem" }}
+        style={{ padding: "0 1.5rem" }}
       >
         <Typography style={{ margin: "0.5rem 0" }} variant="h4">
           {props.title}

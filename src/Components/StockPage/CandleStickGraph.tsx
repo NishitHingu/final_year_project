@@ -9,8 +9,9 @@ import Popper, { PopperPlacementType } from "@mui/material/Popper";
 import Fade from "@mui/material/Fade";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
-import Box from '@mui/material/Box';
+import Box from "@mui/material/Box";
 import img from "../../media/candelStickInfoImg.jpg";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const CandleStickGraph = () => {
   const data: historicalStockData[] | null = getCandleStickData();
@@ -79,7 +80,7 @@ const CandleStickGraph = () => {
 
   return (
     <CustomCollapseComponent hide={true} title="Advance Graph">
-      {/* <Box sx={{width: 500}}>
+      <Box sx={{ width: 500 }}>
         <Popper
           open={open}
           anchorEl={anchorEl}
@@ -91,8 +92,8 @@ const CandleStickGraph = () => {
               <Paper>
                 <Typography sx={{ p: 2 }}>
                   <img
-                  width={500}
-                  height={500}
+                    width={500}
+                    height={500}
                     src={img}
                     alt="Information regarding candleStick Pattern"
                   ></img>
@@ -101,19 +102,28 @@ const CandleStickGraph = () => {
             </Fade>
           )}
         </Popper>
-      </Box> */}
-      {/* <Button onClick={handleClick("bottom")}>bottom</Button> */}
-      <Grid container justifyContent="center" style={{height:"70vh", width: "90vw"}}>
+      </Box>
+      <Grid container justifyContent={"flex-end"}>
+        <Button
+          style={{ margin: "2rem 2rem -2rem auto" }}
+          onClick={handleClick("bottom")}
+        >
+          <InfoOutlinedIcon />
+        </Button>
+      </Grid>
+      <Grid
+        container
+        justifyContent="center"
+        style={{marginLeft: "1rem", height: "70vh", width: "90vw" }}
+      >
         <Chart
           options={options}
           series={[{ data: data }]}
-          width="90%"
+          width="100%"
           height="100%"
           type="candlestick"
         ></Chart>
-
       </Grid>
-        
     </CustomCollapseComponent>
   );
 };

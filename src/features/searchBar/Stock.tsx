@@ -5,6 +5,7 @@ import currency_map from "../../media/jsonData/Country_Currency_map.json";
 
 export interface stockInfo {
   stockName: string;
+  stockLongName: string;
   price: number;
   dayLow: number;
   dayHigh: number;
@@ -59,16 +60,36 @@ const initialState: stockState = {
 // Async Thunk functions
 
 // Make a request to our backend server to get the deatials of the stock.
-export const fetchSearchedStockInfo = createAsyncThunk(
+export const fetchSearchedStockInfoAndNews = createAsyncThunk(
   "stock/fetchSearchedStockInfo",
   async (searchTerm: string) => {
     try {
+
+      // Fetching stock Info
       const response = await axios({
         method: "GET",
         url: `http://localhost:8000/tickInfo/${searchTerm}`,
       });
       console.log(response.data);
-      return Promise.resolve(JSON.parse(response.data));
+      const stockInfo = JSON.parse(response.data);
+
+      // Fetching Stock News
+      console.log(process.env.REACT_NEWS_API_KEY);
+      const newsResponse = await axios({
+        method: "GET",
+        url: `https://api.currentsapi.services/v1/search`,
+        params: {
+          keywords: stockInfo.stockLongName,
+          apiKey: "gubAap9HS5s5lmtGfqPmc6hn6SQJ6JxUBiSdefN3cgJD3Gxo",
+          limit: 20,
+        }
+      });
+      const stockNews = newsResponse.data.news;
+      const data = {
+        stockInfo,
+        stockNews
+      }
+      return Promise.resolve({stockInfo, stockNews})
       
     } catch (err) {
       console.log(err);
@@ -78,6 +99,8 @@ export const fetchSearchedStockInfo = createAsyncThunk(
 );
 
 // Fetches news from the currents API for news: https://currentsapi.services/en/docs/search.
+// Not being used currently as we make the news requesting with the stockInfo itself
+// We do that because we needed the full name of the ticker which we get from the stockInfo 
 export const fetchStockNews = createAsyncThunk(
   "stock/fetchStockNews",
   async (searchTerm: string) => {
@@ -86,10 +109,8 @@ export const fetchStockNews = createAsyncThunk(
         method: "GET",
         url: `https://api.currentsapi.services/v1/search`,
         params: {
-          keywords: "tcs",
-          country: "IN", 
-          category: "finance",
-          apiKey: "gubAap9HS5s5lmtGfqPmc6hn6SQJ6JxUBiSdefN3cgJD3Gxo",
+          keywords: searchTerm,
+          apiKey: process.env.REACT_NEWS_API_KEY,
           limit: 20,
         }
       });
@@ -107,17 +128,9 @@ export const fetchHistoricalStockData = createAsyncThunk(
   "stock/fetchHistoricalStockData",
   async (searchTerm: string) => {
     try {
-      // let year = new Date().getFullYear() - 1;
-      // let month = new Date().getMonth() + 1;
-      // let day = new Date().getDate();
-      // let startDate: string = `${year}-${month}-${day}`;
       const response = await axios({
         method: "GET",
         url: `http://localhost:8000/stock/${searchTerm}/356`,
-        // params: {
-        //   stockName: searchTerm,
-        //   startDate,
-        // },
       });
       const result = JSON.parse(response.data);
       return Promise.resolve(result);
@@ -139,18 +152,22 @@ const stock = createSlice({
   },
   extraReducers: (builder) => {
     // Builder function to update state accourding to the Stock information data fetch progress
-    builder.addCase(fetchSearchedStockInfo.pending, (state, action) => {
+    builder.addCase(fetchSearchedStockInfoAndNews.pending, (state, action) => {
       state.stockInfoStatus = "loading";
+      state.stockNewsStatus = "loading";
     });
-    builder.addCase(fetchSearchedStockInfo.rejected, (state, action) => {
+    builder.addCase(fetchSearchedStockInfoAndNews.rejected, (state, action) => {
       state.stockInfoStatus = "failed";
+      state.stockNewsStatus = "failed";
     });
     builder.addCase(
-      fetchSearchedStockInfo.fulfilled,
-      (state, action) => {
-        state.stockInfo = action.payload;
-        state.searchedStock = action.payload.stockName;
+      fetchSearchedStockInfoAndNews.fulfilled,
+      (state, action: any) => {
+        state.stockInfo = action.payload.stockInfo;
+        state.searchedStock = action.payload.stockInfo.stockName;
+        state.stockNews = action.payload.stockNews;
         state.stockInfoStatus = "succeeded";
+        state.stockNewsStatus = "succeeded";
       }
     );
 
@@ -168,20 +185,22 @@ const stock = createSlice({
         state.historicalDataStatus = "succeeded";
       }
     );
-    builder.addCase(fetchStockNews.pending, (state, action) => {
-      state.stockNewsStatus = "loading";
-    });
-    builder.addCase(fetchStockNews.rejected, (state, action) => {
-      state.stockNewsStatus = "failed";
-    });
-    builder.addCase(
-      fetchStockNews.fulfilled,
-      // Some issue with the action type that i dont understand currently will fix it later: https://github.com/reduxjs/redux-toolkit/issues/1707
-      (state, action: any) => {
-        state.stockNews = action.payload;
-        state.stockNewsStatus = "succeeded";
-      }
-    );
+
+
+    // builder.addCase(fetchStockNews.pending, (state, action) => {
+    //   state.stockNewsStatus = "loading";
+    // });
+    // builder.addCase(fetchStockNews.rejected, (state, action) => {
+    //   state.stockNewsStatus = "failed";
+    // });
+    // builder.addCase(
+    //   fetchStockNews.fulfilled,
+    //   // Some issue with the action type that i dont understand currently will fix it later: https://github.com/reduxjs/redux-toolkit/issues/1707
+    //   (state, action: any) => {
+    //     state.stockNews = action.payload;
+    //     state.stockNewsStatus = "succeeded";
+    //   }
+    // );
   },
 });
 
